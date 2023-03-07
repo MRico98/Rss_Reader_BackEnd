@@ -8,5 +8,8 @@ public interface IRepository<T> {
     IQueryable<T> FindAllSorting(String orderBy);
     void Create(T entity);
     void Create(List<T> entity);
+    void CreateIfConditional(T entity, Expression<Func<T,bool>> expression);
+    void CreateIfConditional(List<T> entity, Expression<Func<T,bool>> expression);
+
     void Save();
 }

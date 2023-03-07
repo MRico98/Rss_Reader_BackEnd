@@ -1,6 +1,5 @@
 
 using Microsoft.AspNetCore.Mvc;
-using Rss_Reader_BackEnd.Models;
 using Rss_Reader_BackEnd.Models.Enum;
 using Rss_Reader_BackEnd.Models.Request;
 using Rss_Reader_BackEnd.Services;
@@ -25,8 +24,11 @@ public class ItemController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Post([FromBody]List<Item> items)
+    public IActionResult Post([FromBody]List<ItemRequest> items)
     {
+        if (!ModelState.IsValid){
+            return BadRequest(ModelState);
+        }
         ItemService.SetNewItems(items);
         return Ok(items);
     }

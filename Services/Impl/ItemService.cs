@@ -1,18 +1,22 @@
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Rss_Reader_BackEnd.Models;
 using Rss_Reader_BackEnd.Models.Enum;
+using Rss_Reader_BackEnd.Models.Request;
 using Rss_Reader_BackEnd.Repositories;
 
 namespace Rss_Reader_BackEnd.Services.Impl;
 
 public class ItemService : IItemService
 {
-    protected IRepository<Item> ItemRepository;
-    protected IRepository<Category> CategoryRepository;
+    protected IRepository<Item>? ItemRepository { get; set; }
+    protected IRepository<CategoryItem>? CategoryItem { get; set; }
+    private readonly IMapper Mapper;
 
-    public ItemService (IRepository<Item> ItemRepository, IRepository<Category> CategoryRepository)
+    public ItemService (IRepository<Item> ItemRepository,IMapper Mapper)
     {
         this.ItemRepository = ItemRepository;
-        this.CategoryRepository = CategoryRepository;
+        this.Mapper = Mapper;
     }
 
     public List<Item> GetAllItems(string sortBy, SortOrder sortOrder)
@@ -25,7 +29,7 @@ public class ItemService : IItemService
         else {
             sortByCondition += " DESC";
         }
-        return ItemRepository.FindAllSorting(sortByCondition).ToList();
+        return ItemRepository.FindAllSorting(sortByCondition).Include(b => b.CategoryItems).ToList();
     }
 
     public void SetNewItem(Item item)
@@ -34,9 +38,10 @@ public class ItemService : IItemService
         ItemRepository.Save();
     }
 
-    public void SetNewItems(List<Item> items)
+    public void SetNewItems(List<ItemRequest> items)
     {
-        ItemRepository.Create(items);
+        List<Item> itemsEntities = Mapper.Map<List<Item>>(items);
+        ItemRepository.Create(itemsEntities);
         ItemRepository.Save();
     }
 }

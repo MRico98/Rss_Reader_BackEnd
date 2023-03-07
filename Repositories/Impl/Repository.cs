@@ -42,4 +42,15 @@ public class Repository<T> : IRepository<T> where T: class
     {
         this.RepositoryContext.SaveChanges();
     }
+
+    public void CreateIfConditional(T entity, Expression<Func<T, bool>> expression)
+    {
+        bool exists = RepositoryContext.Set<T>().Any(expression);
+        if (exists) this.Create(entity);
+    }
+
+    public void CreateIfConditional(List<T> entity, Expression<Func<T, bool>> expression)
+    {
+        throw new NotImplementedException();
+    }
 }
